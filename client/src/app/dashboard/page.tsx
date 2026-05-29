@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { useProgressStore } from '@/stores/progressStore';
@@ -23,12 +26,12 @@ export default function DashboardPage() {
   const unlockedBadges = useBadgeStore((s) => s.unlockedBadges);
   const checkAndUnlockBadges = useBadgeStore((s) => s.checkAndUnlockBadges);
 
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     initAuth();
     initProgress();
     initBadges();
     checkAndUnlockBadges();
-  }
+  }, []);
 
   if (!pseudo) {
     return (

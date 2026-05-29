@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { modules } from '@/data/modules';
 import { useProgressStore } from '@/stores/progressStore';
@@ -8,12 +11,11 @@ export default function ModulesPage() {
   const initAuth = useAuthStore((s) => s.init);
   const initProgress = useProgressStore((s) => s.init);
   const isAuthenticated = useAuthStore((s) => s.pseudo !== null);
-  
-  // Initialize stores
-  if (typeof window !== 'undefined') {
+
+  useEffect(() => {
     initAuth();
     initProgress();
-  }
+  }, []);
 
   return (
     <div className="min-h-screen bg-cyber-bg py-12 px-4">

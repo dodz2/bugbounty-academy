@@ -1,38 +1,19 @@
+'use client';
+
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 import { modules } from '@/data/modules';
-import { lessons, Lesson } from '@/data/lessons';
-import { challenges, Challenge } from '@/data/challenges';
+import { lessons } from '@/data/lessons';
+import { challenges } from '@/data/challenges';
 import { useProgressStore } from '@/stores/progressStore';
 import { useAuthStore } from '@/stores/authStore';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import FlagSubmit from '@/components/FlagSubmit';
 
-export function generateStaticParams() {
-  const params: { slug: string; lessonSlug: string }[] = [];
-
-  modules.forEach((module) => {
-    const moduleLessons = lessons.filter((l) => l.moduleSlug === module.slug);
-    moduleLessons.forEach((lesson) => {
-      params.push({
-        slug: module.slug,
-        lessonSlug: lesson.slug,
-      });
-    });
-  });
-
-  return params;
-}
-
-interface LessonPageProps {
-  params: {
-    slug: string;
-    lessonSlug: string;
-  };
-}
-
-export default function LessonPage({ params }: LessonPageProps) {
-  const { slug, lessonSlug } = params;
+export default function LessonPage() {
+  const { slug, lessonSlug } = useParams<{ slug: string; lessonSlug: string }>();
 
   const module = modules.find((m) => m.slug === slug);
   if (!module) notFound();
@@ -50,10 +31,10 @@ export default function LessonPage({ params }: LessonPageProps) {
   const solvedChallenges = useProgressStore((s) => s.solvedChallenges);
   const pseudo = useAuthStore((s) => s.pseudo);
 
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     initAuth();
     initProgress();
-  }
+  }, []);
 
   const isLessonCompleted = completedLessons.includes(lessonSlug);
   const isChallengeSolved = challenge ? solvedChallenges.includes(challenge.id) : false;
@@ -69,7 +50,6 @@ export default function LessonPage({ params }: LessonPageProps) {
     solveChallenge(challenge.id);
   };
 
-  // Get next lesson
   const moduleLessons = lessons
     .filter((l) => l.moduleSlug === slug)
     .sort((a, b) => a.order - b.order);
@@ -80,20 +60,14 @@ export default function LessonPage({ params }: LessonPageProps) {
   return (
     <div className="min-h-screen bg-cyber-bg py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-text-muted mb-8">
-          <Link href="/modules" className="hover:text-text-primary transition-colors">
-            Modules
-          </Link>
+          <Link href="/modules" className="hover:text-text-primary transition-colors">Modules</Link>
           <span>/</span>
-          <Link href={`/modules/${slug}`} className="hover:text-text-primary transition-colors">
-            {module.title}
-          </Link>
+          <Link href={`/modules/${slug}`} className="hover:text-text-primary transition-colors">{module.title}</Link>
           <span>/</span>
           <span className="text-text-primary">{lesson.title}</span>
         </div>
 
-        {/* Lesson Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <span className="px-3 py-1 bg-cyber-surface rounded-full text-sm text-accent-blue">
@@ -105,18 +79,14 @@ export default function LessonPage({ params }: LessonPageProps) {
               </span>
             )}
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
-            {lesson.title}
-          </h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">{lesson.title}</h1>
           <p className="text-text-secondary text-lg">{lesson.description}</p>
         </div>
 
-        {/* Lesson Content */}
         <div className="bg-cyber-card border border-cyber-border rounded-2xl p-8 mb-8">
           <MarkdownRenderer content={lesson.content} />
         </div>
 
-        {/* Complete Lesson Button */}
         {isAuthenticated && !isLessonCompleted && (
           <div className="mb-8 text-center">
             <button
@@ -128,7 +98,6 @@ export default function LessonPage({ params }: LessonPageProps) {
           </div>
         )}
 
-        {/* Challenge Section */}
         {challenge && (
           <div className="bg-cyber-card border border-cyber-border rounded-2xl p-8 mb-8">
             <h2 className="text-2xl font-bold text-text-primary mb-6 flex items-center gap-3">
@@ -137,9 +106,7 @@ export default function LessonPage({ params }: LessonPageProps) {
               </svg>
               Challenge : {challenge.title}
             </h2>
-
             <p className="text-text-secondary mb-6">{challenge.prompt}</p>
-
             {isAuthenticated ? (
               <FlagSubmit
                 challenge={challenge}
@@ -149,10 +116,7 @@ export default function LessonPage({ params }: LessonPageProps) {
             ) : (
               <div className="text-center py-6">
                 <p className="text-text-muted mb-4">Connectez-vous pour soumettre le flag</p>
-                <Link
-                  href="/setup"
-                  className="inline-block px-6 py-2 bg-accent-green text-cyber-bg rounded-lg text-sm font-semibold hover:bg-accent-green-dim transition-colors"
-                >
+                <Link href="/setup" className="inline-block px-6 py-2 bg-accent-green text-cyber-bg rounded-lg text-sm font-semibold hover:bg-accent-green-dim transition-colors">
                   Choisir un pseudo
                 </Link>
               </div>
@@ -160,27 +124,18 @@ export default function LessonPage({ params }: LessonPageProps) {
           </div>
         )}
 
-        {/* Navigation Between Lessons */}
         <div className="flex justify-between items-center pt-8 border-t border-cyber-border">
           {prevLesson ? (
-            <Link
-              href={`/modules/${slug}/${prevLesson.slug}`}
-              className="flex items-center gap-2 px-4 py-2 text-text-secondary hover:text-text-primary transition-colors"
-            >
+            <Link href={`/modules/${slug}/${prevLesson.slug}`} className="flex items-center gap-2 px-4 py-2 text-text-secondary hover:text-text-primary transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               {prevLesson.title}
             </Link>
-          ) : (
-            <div />
-          )}
+          ) : <div />}
 
           {nextLesson && isLessonCompleted ? (
-            <Link
-              href={`/modules/${slug}/${nextLesson.slug}`}
-              className="flex items-center gap-2 px-4 py-2 bg-cyber-surface text-text-primary rounded-lg hover:bg-cyber-card transition-colors"
-            >
+            <Link href={`/modules/${slug}/${nextLesson.slug}`} className="flex items-center gap-2 px-4 py-2 bg-cyber-surface text-text-primary rounded-lg hover:bg-cyber-card transition-colors">
               {nextLesson.title}
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -189,10 +144,7 @@ export default function LessonPage({ params }: LessonPageProps) {
           ) : nextLesson && !isLessonCompleted ? (
             <span className="text-text-muted text-sm">Terminez la leçon pour continuer</span>
           ) : (
-            <Link
-              href={`/modules/${slug}`}
-              className="flex items-center gap-2 px-4 py-2 text-text-secondary hover:text-text-primary transition-colors"
-            >
+            <Link href={`/modules/${slug}`} className="flex items-center gap-2 px-4 py-2 text-text-secondary hover:text-text-primary transition-colors">
               Retour au module
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
