@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   BugBounty Academy - Global Styles
+   ============================================ */
+
+@layer base {
+  /* Import fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-cyber-bg text-text-primary font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-cyber-bg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cyber-border-light rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-text-muted;
+  }
+}
+
+@layer components {
+  /* Terminal-style code blocks */
+  .code-block {
+    @apply bg-cyber-bg border border-cyber-border rounded-lg p-4 font-mono text-sm overflow-x-auto;
+  }
+
+  /* Glowing green accent for interactive elements */
+  .glow-green {
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+  }
+
+  .glow-green:hover {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  }
+
+  /* Card component base */
+  .card {
+    @apply bg-cyber-card border border-cyber-border rounded-xl p-6 transition-all duration-200;
+  }
+
+  .card:hover {
+    @apply border-cyber-border-light;
+  }
+
+  /* Badge pill */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-beginner {
+    @apply bg-accent-green/10 text-accent-green;
+  }
+
+  .badge-intermediate {
+    @apply bg-accent-orange/10 text-accent-orange;
+  }
+
+  .badge-advanced {
+    @apply bg-accent-red/10 text-accent-red;
+  }
+
+  /* Flag input */
+  .flag-input {
+    @apply w-full bg-cyber-bg border border-cyber-border rounded-lg px-4 py-3 font-mono text-sm
+           text-accent-green placeholder-text-muted
+           focus:outline-none focus:border-accent-green focus:ring-1 focus:ring-accent-green/50
+           transition-all duration-200;
+  }
+}
+
+@layer utilities {
+  /* Text gradient for headings */
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent-green to-accent-blue bg-clip-text text-transparent;
+  }
+}
